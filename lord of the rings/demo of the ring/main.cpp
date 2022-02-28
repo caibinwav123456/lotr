@@ -3,6 +3,7 @@
 #include<math.h>
 #include "ring.h"
 #include <mmsystem.h>
+#include "resource.h"
 #define MAKEDWORD(x,y) ((x)|((y)<<16))
 int globe=0;
 LRESULT CALLBACK WndProc(HWND,UINT,WPARAM,LPARAM);
@@ -20,7 +21,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	wc.cbClsExtra=0;
 	wc.cbWndExtra=0;
 	wc.hInstance=hInstance;
-	wc.hIcon=LoadIcon(NULL,IDI_APPLICATION);
+	wc.hIcon=LoadIcon(hInstance,MAKEINTRESOURCE(IDI_ICON_256));
 	wc.hCursor=LoadCursor(NULL,IDC_ARROW);
 	wc.hbrBackground=(HBRUSH)GetStockObject(WHITE_BRUSH);
 	wc.lpszMenuName=NULL;
