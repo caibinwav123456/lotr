@@ -1,9 +1,11 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual Studio 2008
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "demo of the ring", "demo of the ring\demo of the ring.vcproj", "{21160A7B-8FE7-47B3-813F-C470D24577C8}"
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.33027.164
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "demo of the ring", "demo of the ring\demo of the ring.vcxproj", "{21160A7B-8FE7-47B3-813F-C470D24577C8}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lord of the rings", "lord of the rings\lord of the rings.vcproj", "{7ECCFDAD-B361-4455-A17B-64F53E5A0075}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lord of the rings", "lord of the rings\lord of the rings.vcxproj", "{7ECCFDAD-B361-4455-A17B-64F53E5A0075}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -22,5 +24,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D0A33F58-D7CB-46C7-92CF-0829E4B86B9D}
 	EndGlobalSection
 EndGlobal
