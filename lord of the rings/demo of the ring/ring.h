@@ -2,6 +2,7 @@
 #define _ring_h
 #include "d3dx9.h"
 #include "d3dfont.h"
+#include "config_val_extern.h"
 
 extern IDirect3DDevice9* device;
 extern DWORD BehaviorFlags;
@@ -9,6 +10,12 @@ extern D3DXVECTOR3 Pos;
 extern D3DXVECTOR3 Engine;
 extern D3DXVECTOR3 Velocity;
 extern float *h_map;
+
+extern int HRes;
+extern int VRes;
+extern int HResF;
+extern int VResF;
+DECLARE_BOOL_VAL(Windowed);
 
 struct vertex
 {
@@ -24,10 +31,13 @@ struct vertex
 	{_x=pos.x;_y=pos.y;_z=pos.z;_nx=norm.x;_ny=norm.y;_nz=norm.z;lx=norm1.x;ly=norm1.y;lz=norm1.z;/**/_u=tex.x;_v=tex.y;}
 };
 
-bool InitD3D(int w,int h,HWND hwnd);
+bool PreInit(char* cfgfile);
+bool InitD3D(int w,int h,int& rfrhrate,HWND hwnd,bool windowed);
 bool Setup();
 void Cleanup();
 bool Display(float tdelta);
+bool FrameMove(float tdelta,float rtc);
+bool Present();
 void onmdown(HWND hwnd);
 void onmup(HWND hwnd);
 void onrdown(HWND hwnd);

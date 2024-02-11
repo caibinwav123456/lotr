@@ -77,7 +77,7 @@ void BuildMesh(vertex* vertices,DWORD* indices)
 			v._nz=l._nx*sin(D3DX_PI/50*i);
 			v.lx=l.lx*cos(D3DX_PI/50*i);
 			v.lz=l.lx*sin(D3DX_PI/50*i);
-			v._u=1./50*i;v._v=l._v;
+			v._u=1./50*(j>=23?i:50-i);v._v=l._v;
 		}
 	for(i=51;i<102;i++)
 		for(int j=0;j<49;j++)
@@ -91,7 +91,7 @@ void BuildMesh(vertex* vertices,DWORD* indices)
 			v._nz=l._nx*sin(D3DX_PI/50*(i-1));
 			v.lx=l.lx*cos(D3DX_PI/50*(i-1));
 			v.lz=l.lx*sin(D3DX_PI/50*(i-1));
-			v._u=1./50*(i-51);v._v=l._u;
+			v._u=1./50*(j>=23?i-51:101-i);v._v=l._u;
 		}
 
 	for(i=0;i<102*49;i++)

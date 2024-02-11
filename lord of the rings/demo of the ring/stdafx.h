@@ -19,7 +19,6 @@
 #include "d3dx9.h"
 #include "ring.h"
 // TODO: reference additional headers your program requires here
-extern int Width,Height;
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.
 

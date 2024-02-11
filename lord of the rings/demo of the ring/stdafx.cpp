@@ -4,12 +4,16 @@
 
 #include "stdafx.h"
 #include "resource.h"
-int Width=0,Height=0;
-bool InitD3D(int w,int h,HWND hwnd)
+bool InitD3D(int w,int h,int& rfrhrate,HWND hwnd,bool windowed)
 {
 	IDirect3D9* d3d9;
 	d3d9=Direct3DCreate9(D3D_SDK_VERSION);
 	if(!d3d9)return 0;
+
+	D3DDISPLAYMODE dispMode;
+	d3d9->GetAdapterDisplayMode(D3DADAPTER_DEFAULT,&dispMode);
+	rfrhrate=dispMode.RefreshRate;
+
 	D3DCAPS9 caps;
 	DWORD dwBehaviorFlags = D3DCREATE_HARDWARE_VERTEXPROCESSING;
 	d3d9->GetDeviceCaps(D3DADAPTER_DEFAULT,D3DDEVTYPE_HAL,&caps);
@@ -33,7 +37,7 @@ bool InitD3D(int w,int h,HWND hwnd)
 	d3dpp.MultiSampleQuality=0;
 	d3dpp.SwapEffect=D3DSWAPEFFECT_DISCARD;
 	d3dpp.hDeviceWindow=hwnd;
-	d3dpp.Windowed=true;
+	d3dpp.Windowed=windowed;
 	d3dpp.EnableAutoDepthStencil=true;
 	d3dpp.AutoDepthStencilFormat=D3DFMT_D24S8;
 	d3dpp.Flags=0;
@@ -51,9 +55,9 @@ bool InitD3D(int w,int h,HWND hwnd)
 	if(FAILED(hr))
 	{
 		MessageBox(0,"device failed",0,0);
-		return 0;
+		return false;
 	}
-	return 1;
+	return true;
 }
 
 // TODO: reference any additional headers you need in STDAFX.H

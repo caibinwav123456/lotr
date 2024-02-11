@@ -24,8 +24,8 @@ int index;
 
 Texture Tex;//complex num and count
 Texture Mask;//intermediate output
-Texture Bk<string name="spheremap.bmp";>;//background
-Texture Env<string name="spheremap.bmp";>;//environment map
+Texture Bk<string name="spheremap.png";>;//background
+Texture Env<string name="spheremap.png";>;//environment map
 Texture Script<string name="script1.dds";>;//script map
 
 //

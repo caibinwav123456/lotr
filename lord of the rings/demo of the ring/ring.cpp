@@ -6,10 +6,14 @@
 #include <time.h>
 #include <stdlib.h>
 #include "dxutil.h"
+#include "config.h"
+#include "config_val.h"
+#include "config_val_extern.h"
+#define MOUSE_DRAG 0.025
 
 extern int globe;
 int W=0,H=0;
-float tcon=0,fcon=0;char txt[50]="Frame rate:0fps";char txt1[20]="Scale:10";char txt2[50]="";
+char txt[50]="";char txt1[20]="Scale:10";char txt2[50]="";
 char txt3[20]="Press F1 for help";
 char txt4[500]=
 "Move:Arrow Keys\n"
@@ -19,7 +23,7 @@ char txt4[500]=
 "Set value:W,S\n"
 "Hide Info:F2";
 int help=0;
-int showmsg=1;
+int showmsg=0;
 float wscale=-3.0;
 int col=0;
 POINT pt={0,0};
@@ -39,7 +43,8 @@ int techlevel=0;
 D3DXVECTOR4 lp(0,0,-10,0),lpt;
 D3DXVECTOR4 ep(0,0,-10,1);
 D3DXVECTOR4 sceensize(0,0,0,0);
-D3DXMATRIX view,proj,Rx,Ry,trans,world,step,worldview,lr,inv,word,Rs;
+D3DXVECTOR2 anglea(0,0);
+D3DXMATRIX view,proj,Rx,Ry,trans,world,step,worldview,lr,inv,rotation,Rs;
 D3DXVECTOR3 xt(1,0,0),yt(0,1,0),zt(0,0,1);
 CD3DFont* font;
 int keystate=0,hitstate=(1<<20);
@@ -58,6 +63,16 @@ IDirect3DTexture9* texture_script;
 #define TYPE_FLOAT 2
 #define TYPE_MAT   3
 #define TYPE_VEC   4
+
+bool PreInit(char* cfgfile)
+{
+	ConfigProfile profile;
+	if(profile.LoadConfigFile(cfgfile==NULL?CFG_FILE_PATH:cfgfile)!=0)
+		return false;
+	config_val_container::get_val_container()->config_value(&profile);
+	return true;
+}
+
 void SetUserValue(char *name,void* val,int type)
 {
 	D3DXHANDLE handle=effect->GetParameterByName(0,name);
@@ -80,7 +95,7 @@ void SetUserValue(char *name,void* val,int type)
 
 bool Setup()
 {
-	W=Width;H=Height;
+	W=HResF;H=VResF;
 	sceensize.x=sceensize.z=W;
 	sceensize.y=sceensize.w=H;
 	HRESULT hr;
@@ -231,7 +246,7 @@ bool Setup()
 	device->SetRenderState(D3DRS_LIGHTING,false);
 	device->SetRenderState(D3DRS_ZENABLE,true);
 
-	D3DXMatrixIdentity(&word);
+	D3DXMatrixIdentity(&rotation);
 
 	font=new CD3DFont("Times New Roman",16,0);
 	font->InitDeviceObjects(device);
@@ -246,7 +261,7 @@ bool Setup()
 	D3DXMatrixIdentity(&lr);
 	D3DXMatrixTranslation(&trans,0,0,10);
 	view=trans;
-	worldview=word*world*view;
+	worldview=rotation*world*view;
 	D3DVERTEXELEMENT9 decl[]={
 							 {0,0,D3DDECLTYPE_FLOAT3,D3DDECLMETHOD_DEFAULT,
 							 D3DDECLUSAGE_POSITION,0},
@@ -314,9 +329,47 @@ void Cleanup()
 	SAFE_RELEASE(texture_script);
 	SAFE_RELEASE(device);
 }
-
-void FrameMove(float tdelta)
+void ProcessMouseMove(float tdelta);
+bool FrameMove(float tdelta,float rtc)
 {
+	static float tcount=0,fcount=0;
+	tcount+=rtc;fcount++;
+	if(tcount>=1.)
+	{
+		char txtwnd[30]="",*txtvp;
+		switch(BehaviorFlags)
+		{
+		case D3DCREATE_HARDWARE_VERTEXPROCESSING:
+			txtvp="(hw vp)";
+			break;
+		case D3DCREATE_SOFTWARE_VERTEXPROCESSING:
+			txtvp="(sw vp)";
+			break;
+		default:
+			txtvp="";
+			break;
+		}
+		if(Windowed)
+			sprintf(txtwnd,"(Wnd:%d*%d)",HResF,VResF);
+		sprintf(txt,"%d*%d%s,%dfps%s",HRes,VRes,txtwnd,(int)fcount,txtvp);
+		tcount=0,fcount=0;
+	}
+	switch(item)
+	{
+	case 0:sprintf(txt1,"AutoMode");sprintf(txt2,autodemo!=0?"ON":"OFF");break;
+	case 1:sprintf(txt1,"Glow");sprintf(txt2,"%d",(int)(100*glow));break;
+	case 2:sprintf(txt1,"Red");sprintf(txt2,"%d",(int)(100*red));break;
+	case 3:sprintf(txt1,"Scale");sprintf(txt2,"%d",(int)(100*scale));break;
+	case 4:sprintf(txt1,"Swell");sprintf(txt2,"%d",(int)(1000*swell));break;
+	}
+	
+	scale+=(dscale-scale)*tdelta;
+	if(autodemo==0)swell+=(dswell-swell)*tdelta;
+	red+=(dred-red)*tdelta;
+	glow+=(dglow-glow)*tdelta;
+	if(autodemo!=0)Differ(tdelta);
+
+	ProcessMouseMove(tdelta);
 	D3DXMatrixIdentity(&step);
 	if(keystate&(1<<3))
 	{
@@ -378,8 +431,9 @@ void FrameMove(float tdelta)
 	view=trans;
 	D3DXVec4Transform(&lpt,&lp,&lr);
 	D3DXMatrixRotationY(&Ry,-tdelta*0.5);
-	if(!mode)word=word*Ry;
-	worldview=word*world*view;
+	if(!mode)rotation=rotation*Ry;
+	worldview=rotation*world*view;
+	return true;
 }
 
 void InitPassNum(int npass,int *ipass, char** pname, int nname)
@@ -406,7 +460,6 @@ bool Display(float tdelta)
 {
 	if(!device)
 		return false;
-	FrameMove(tdelta);
 	static int tindex=0;
 	static bool binit=true;
 	D3DXHANDLE handle;
@@ -534,43 +587,22 @@ bool Display(float tdelta)
 		if(showmsg)
 		{
 			font->DrawText(0,0,0xffff0000,txt);
-			font->DrawText(0,20,0xffff0000,txt1);
-			font->DrawText(0,40,0xffff0000,txt2);
-			if(help==0)font->DrawText(0,60,0xffff0000,txt3);
-			else font->DrawText(0,60,0xffff0000,txt4);
+			font->DrawText(0,30,0xffff0000,txt1);
+			font->DrawText(0,60,0xffff0000,txt2);
+			if(help==0)font->DrawText(0,90,0xffff0000,txt3);
+			else font->DrawText(0,90,0xffff0000,txt4);
 		}
 		device->EndScene();
 	}
 	effect->End();
 
-	device->Present(0,0,0,0);
 	tindex=1-tindex;
 
-	static float tcount=0,fcount=0;
-	tcount+=tdelta;fcount++;
-	if(tcount>=1.)
-	{
-		if(BehaviorFlags == D3DCREATE_HARDWARE_VERTEXPROCESSING)
-			sprintf(txt,"Frame rate:%dfps(hw vp)",(int)fcount);
-		else if(BehaviorFlags == D3DCREATE_SOFTWARE_VERTEXPROCESSING)
-			sprintf(txt,"Frame rate:%dfps(sw vp)",(int)fcount);
-		tcount=0,fcount=0;
-	}
-	switch(item)
-	{
-	case 0:sprintf(txt1,"AutoMode");sprintf(txt2,autodemo!=0?"ON":"OFF");break;
-	case 1:sprintf(txt1,"Glow");sprintf(txt2,"%d",(int)(100*glow));break;
-	case 2:sprintf(txt1,"Red");sprintf(txt2,"%d",(int)(100*red));break;
-	case 3:sprintf(txt1,"Scale");sprintf(txt2,"%d",(int)(100*scale));break;
-	case 4:sprintf(txt1,"Swell");sprintf(txt2,"%d",(int)(1000*swell));break;
-	}
-	
-	scale+=(dscale-scale)*tdelta;
-	if(autodemo==0)swell+=(dswell-swell)*tdelta;
-	red+=(dred-red)*tdelta;
-	glow+=(dglow-glow)*tdelta;
-	if(autodemo!=0)Differ(tdelta);
-
+	return true;
+}
+bool Present()
+{
+	device->Present(0,0,0,0);//MessageBox(0,"vb failed",0,0);
 	return true;
 }
 
@@ -587,15 +619,26 @@ void onmove(HWND hwnd)
 	::GetCursorPos(&pt);
 	float X=pt.x-ptlast.x;
 	float Y=pt.y-ptlast.y;
-	D3DXMatrixRotationX(&Rx,-Y/100);
-	D3DXMatrixRotationY(&Ry,-X/100);
+	anglea.x+=(float)X/100;
+	anglea.y+=(float)Y/100;
+}
+void ProcessMouseMove(float tdelta)
+{
+	const float inv_dim_time=1.0/MOUSE_DRAG;
+	float acct=1-exp(-tdelta*inv_dim_time);
+	if(acct>1)acct=1;
+	D3DXVECTOR2 acc=anglea*acct;
+	anglea-=acc;
+
+	D3DXMatrixRotationX(&Rx,-acc.y);
+	D3DXMatrixRotationY(&Ry,-acc.x);
 	if(mode)
 	{
 		if(keystate&(1<<18))
 		{
 			D3DXVECTOR3 pos(0,0,0),tp;
 			D3DXVec3TransformCoord(&tp,&pos,&trans);
-			D3DXMatrixTranslation(&step,X/480*tp.z,-Y/480*tp.z,0);
+			D3DXMatrixTranslation(&step,acc.x/10*tp.z,-acc.y/10*tp.z,0);
 			trans*=step;
 		}
 		else
