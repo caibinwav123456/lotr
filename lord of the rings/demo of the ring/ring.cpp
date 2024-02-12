@@ -14,7 +14,7 @@
 extern int globe;
 int W=0,H=0;
 char txt[50]="";char txt1[20]="Scale:10";char txt2[50]="";
-char txt3[20]="Press F1 for help";
+char txt3[]="Press F2 for help, F1 to hide this message display";
 char txt4[500]=
 "Move:Arrow Keys\n"
 "Rotate model:Left Mouse Key\n"

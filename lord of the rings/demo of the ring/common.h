@@ -18,8 +18,30 @@ typedef unsigned long dword;
 #else
 #define verify(m) (m)
 #endif
+#if defined(WIN32) || defined(WINDOWS) || defined(_WINDOWS)
+#define BUILD_ON_WINDOWS
+#pragma warning(disable:4996)
+#pragma warning(disable:4251)
+#pragma warning(disable:4244)
+#pragma warning(disable:4267)
+#ifndef DLL_IMPORT
+#define DLL __declspec(dllexport)
+#else
+#define DLL __declspec(dllimport)
+#endif
+#define DLLAPI(T) DLL T __stdcall
+#define main_entry WINAPI _tWinMain
+#define main_args HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nShowCmd
+#else
+#ifndef DLL_IMPORT
+#define DLL __attribute__((visibility("default")))
+#else
 #define DLL
+#endif
 #define DLLAPI(T) DLL T
+#define main_entry main
+#define main_args int argc, char** argv
+#endif
 #include "ASTError.h"
 #include "defines.h"
 #include "sys.h"
