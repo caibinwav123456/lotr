@@ -14,7 +14,7 @@
 extern int globe;
 int W=0,H=0;
 char txt[50]="";char txt1[20]="Scale:10";char txt2[50]="";
-char txt3[]="Press F2 for help, F1 to hide this message display";
+char txt3[]="Press F2 for help, F1 to hide this information";
 char txt4[500]=
 "Move:Arrow Keys\n"
 "Rotate model:Left Mouse Key\n"
@@ -42,9 +42,9 @@ char availabletechnique[10]="";
 int techlevel=0;
 D3DXVECTOR4 lp(0,0,-10,0),lpt;
 D3DXVECTOR4 ep(0,0,-10,1);
-D3DXVECTOR4 sceensize(0,0,0,0);
+D3DXVECTOR4 screensize(0,0,0,0);
 D3DXVECTOR2 anglea(0,0);
-D3DXMATRIX view,proj,Rx,Ry,trans,world,step,worldview,lr,inv,rotation,Rs;
+D3DXMATRIX view,proj,Rx,Ry,trans,world,step,worldview,lr,inv,spin,Rs;
 D3DXVECTOR3 xt(1,0,0),yt(0,1,0),zt(0,0,1);
 CD3DFont* font;
 int keystate=0,hitstate=(1<<20);
@@ -95,9 +95,9 @@ void SetUserValue(char *name,void* val,int type)
 
 bool Setup()
 {
-	W=HResF;H=VResF;
-	sceensize.x=sceensize.z=W;
-	sceensize.y=sceensize.w=H;
+	W=HRes;H=VRes;
+	screensize.x=screensize.z=W;
+	screensize.y=screensize.w=H;
 	HRESULT hr;
 	int i;
 	for(i=0;i<3;i++)
@@ -246,7 +246,7 @@ bool Setup()
 	device->SetRenderState(D3DRS_LIGHTING,false);
 	device->SetRenderState(D3DRS_ZENABLE,true);
 
-	D3DXMatrixIdentity(&rotation);
+	D3DXMatrixIdentity(&spin);
 
 	font=new CD3DFont("Times New Roman",16,0);
 	font->InitDeviceObjects(device);
@@ -261,7 +261,7 @@ bool Setup()
 	D3DXMatrixIdentity(&lr);
 	D3DXMatrixTranslation(&trans,0,0,10);
 	view=trans;
-	worldview=rotation*world*view;
+	worldview=spin*world*view;
 	D3DVERTEXELEMENT9 decl[]={
 							 {0,0,D3DDECLTYPE_FLOAT3,D3DDECLMETHOD_DEFAULT,
 							 D3DDECLUSAGE_POSITION,0},
@@ -298,8 +298,8 @@ bool Setup()
 
 void OnSize(int width,int height)
 {
-	sceensize.x=width;
-	sceensize.y=height;
+	screensize.x=width;
+	screensize.y=height;
 	D3DXMatrixPerspectiveFovLH(
 		&proj,
 		D3DX_PI/3,
@@ -431,8 +431,8 @@ bool FrameMove(float tdelta,float rtc)
 	view=trans;
 	D3DXVec4Transform(&lpt,&lp,&lr);
 	D3DXMatrixRotationY(&Ry,-tdelta*0.5);
-	if(!mode)rotation=rotation*Ry;
-	worldview=rotation*world*view;
+	if(!mode)spin*=Ry;
+	worldview=spin*world*view;
 	return true;
 }
 
@@ -464,27 +464,38 @@ bool Display(float tdelta)
 	static bool binit=true;
 	D3DXHANDLE handle;
 	static int ipass[5]={-1,-1,-1,-1,-1};
-
-	if(binit)
-	{
-		device->SetRenderTarget(0,accsurf[0]);
-		device->Clear(0,0,D3DCLEAR_TARGET,
-			0x00000000,0.0f,0);
-	}
+	UINT npass=0;
 
 	handle=effect->GetTechniqueByName(availabletechnique);
 	effect->SetTechnique(handle);
-	UINT npass=0;
 	effect->Begin(&npass, 0);
 
 	if(binit)
 	{
 		char* pname[5]={"P0","P1","P2","P1_0","P1_1"};
+		device->SetRenderTarget(0,accsurf[0]);
+		device->Clear(0,0,D3DCLEAR_TARGET,
+			0x00000000,0.0f,0);
 		InitPassNum(npass,ipass,pname,5);
 		binit=false;
 	}
 	if(ipass[0]<0||ipass[2]<0||(ipass[1]<0&&(ipass[3]<0||ipass[4]<0)))
+	{
+		effect->End();
 		return false;
+	}
+
+	SetUserValue("worldview",(void*)&worldview,TYPE_MAT);
+	SetUserValue("proj",(void*)&proj,TYPE_MAT);
+	SetUserValue("lp",(void*)&lpt,TYPE_VEC);
+	SetUserValue("red",(void*)&red,TYPE_FLOAT);
+	SetUserValue("swell",(void*)&swell,TYPE_FLOAT);
+	SetUserValue("scale",(void*)&scale,TYPE_FLOAT);
+	SetUserValue("glow",(void*)&glow,TYPE_FLOAT);
+	SetUserValue("screensize",(void*)&screensize,TYPE_VEC);
+	if(techlevel==1)
+		SetUserValue("index",&tindex,TYPE_INT);
+
 	//Phase 1
 	{
 		device->SetRenderTarget(0,mainsurf);
@@ -502,12 +513,6 @@ bool Display(float tdelta)
 
 		device->SetRenderState(D3DRS_ZENABLE,true);
 		device->SetRenderState(D3DRS_ZWRITEENABLE,true);
-		SetUserValue("worldview",(void*)&worldview,TYPE_MAT);
-		SetUserValue("proj",(void*)&proj,TYPE_MAT);
-		SetUserValue("lp",(void*)&lpt,TYPE_VEC);
-		SetUserValue("red",(void*)&red,TYPE_FLOAT);
-		SetUserValue("swell",(void*)&swell,TYPE_FLOAT);
-		SetUserValue("scale",(void*)&scale,TYPE_FLOAT);
 		device->Clear(0,0,D3DCLEAR_TARGET|D3DCLEAR_ZBUFFER,
 			0x00000000,100.0f,0);
 		device->BeginScene();
@@ -536,10 +541,6 @@ bool Display(float tdelta)
 
 		device->SetRenderState(D3DRS_ZENABLE,false);
 		device->SetRenderState(D3DRS_ZWRITEENABLE,false);
-		SetUserValue("glow",(void*)&glow,TYPE_FLOAT);
-		SetUserValue("screensize",(void*)&sceensize,TYPE_VEC);
-		if(techlevel==1)
-			SetUserValue("index",&tindex,TYPE_INT);
 		device->Clear(0,0,D3DCLEAR_TARGET,
 			0x00000000,100.0f,0);
 		device->BeginScene();

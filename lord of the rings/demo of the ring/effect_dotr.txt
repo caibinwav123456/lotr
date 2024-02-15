@@ -270,7 +270,8 @@ PS_OUTPUT ps_main_out_v3_1(PS_OUT_INPUT input)
 		float x=(float)i/span*3;
 		float co=exp(-x*x);
 		ac+=co;
-		acc+=co*tex2D(sa,input.tex0+float2(0,offv*i));
+		float2 t=input.tex0+float2(0,offv*i);
+		acc+=co*tex2D(sa,t);
 	}
 	acc/=ac;
 	output.color=acc;
