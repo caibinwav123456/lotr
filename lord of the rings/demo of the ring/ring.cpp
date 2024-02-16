@@ -66,6 +66,9 @@ IDirect3DTexture9* texture_script;
 
 bool PreInit(char* cfgfile)
 {
+	dword type;
+	if(sys_fstat(cfgfile,&type)!=0||type==FILE_TYPE_DIR)
+		return true;
 	ConfigProfile profile;
 	if(profile.LoadConfigFile(cfgfile==NULL?CFG_FILE_PATH:cfgfile)!=0)
 		return false;
@@ -96,8 +99,10 @@ void SetUserValue(char *name,void* val,int type)
 bool Setup()
 {
 	W=HRes;H=VRes;
-	screensize.x=screensize.z=W;
-	screensize.y=screensize.w=H;
+	screensize.z=W;
+	screensize.w=H;
+	screensize.x=W/2;
+	screensize.y=H/2;
 	HRESULT hr;
 	int i;
 	for(i=0;i<3;i++)
@@ -298,8 +303,6 @@ bool Setup()
 
 void OnSize(int width,int height)
 {
-	screensize.x=width;
-	screensize.y=height;
 	D3DXMatrixPerspectiveFovLH(
 		&proj,
 		D3DX_PI/3,

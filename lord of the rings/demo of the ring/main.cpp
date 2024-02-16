@@ -56,7 +56,7 @@ static bool parse_cmdline(char** cfg,char* buf,uint buflen)
 			*cfg=cfgstart;
 	}
 	else
-		*cfg=NULL;
+		*cfg="config.cfg";
 	return true;
 }
 int WINAPI WinMain(HINSTANCE hInstance,

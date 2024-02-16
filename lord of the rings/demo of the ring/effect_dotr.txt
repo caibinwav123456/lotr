@@ -210,7 +210,7 @@ PS_OUTPUT ps_main_out(PS_OUT_INPUT input)
 	float width=screensize.z;
 	float height=screensize.w;
 	float4 acc=0;
-	input.tex0+=float2(1./width,1./height);
+	input.tex0+=float2(0.5/width,0.5/height);
 	acc.r=step(0.75,tex2D(sb,input.tex0).a)*0.3*glow;
 	//acc.gb=0.1*acc.r;
 	float offu=2./width,offv=2./height;
@@ -235,10 +235,10 @@ PS_OUTPUT ps_main_out_v3_0(PS_OUT_INPUT input)
 	float width=screensize.z;
 	float height=screensize.w;
 	float4 acc=0;
-	input.tex0+=float2(1./width,1./height);
+	input.tex0+=float2(0.5/width,0.5/height);
 	acc.r=0;
-	float offu=2./width,offv=2./height;
-	int span=50;
+	float offu=1./width,offv=1./height;
+	int span=height/8;
 	float ac=0;
 	for(int i=-span;i<=span;i++)
 	{
@@ -246,7 +246,7 @@ PS_OUTPUT ps_main_out_v3_0(PS_OUT_INPUT input)
 		float co=exp(-x*x);
 		ac+=co;
 		float2 t=input.tex0+float2(offu*i,0);
-		acc.r+=co*(step(0.75,tex2D(sb,t).a)*10.0*glow);
+		acc.r+=co*(step(0.75,tex2Dlod(sb,float4(t,0,0)).a)*10.0*glow);
 	}
 	acc/=ac;
 	output.color=acc;
@@ -257,13 +257,13 @@ PS_OUTPUT ps_main_out_v3_0(PS_OUT_INPUT input)
 PS_OUTPUT ps_main_out_v3_1(PS_OUT_INPUT input)
 {
 	PS_OUTPUT output=(PS_OUTPUT)0;
-	float width=screensize.z;
-	float height=screensize.w;
+	float width=screensize.x;
+	float height=screensize.y;
 	float4 acc=0;
-	input.tex0+=float2(1./width,1./height);
+	input.tex0+=float2(0.5/width,0.5/height);
 	acc.r=0;
-	float offu=2./width,offv=2./height;
-	int span=50;
+	float offu=1./width,offv=1./height;
+	int span=height/8;
 	float ac=0;
 	for(int i=-span;i<=span;i++)
 	{
@@ -271,7 +271,7 @@ PS_OUTPUT ps_main_out_v3_1(PS_OUT_INPUT input)
 		float co=exp(-x*x);
 		ac+=co;
 		float2 t=input.tex0+float2(0,offv*i);
-		acc+=co*tex2D(sa,t);
+		acc+=co*tex2Dlod(sa,float4(t,0,0));
 	}
 	acc/=ac;
 	output.color=acc;
