@@ -95,7 +95,18 @@ void SetUserValue(char *name,void* val,int type)
 		break;
 	}
 }
-
+#ifdef RESOURCE
+bool LoadResourceData(LPVOID* pData, int* nData, int nID, LPCTSTR strType)
+{
+	HRSRC hRsrc=FindResource(NULL,MAKEINTRESOURCE(nID),strType);
+	if(hRsrc==NULL)
+		return false;
+	HGLOBAL h=LoadResource(NULL,hRsrc);
+	*pData=LockResource(h);
+	*nData=SizeofResource(NULL,hRsrc);
+	return true;
+}
+#endif
 bool Setup()
 {
 	W=HRes;H=VRes;
@@ -136,7 +147,7 @@ bool Setup()
 #ifdef RESOURCE
 	LPVOID pData;
 	int nData;
-	if(!LoadResourceData(&pData, &nData, MAKEINTRESOURCE(IDR_FX1), _T("FX")))
+	if(!LoadResourceData(&pData, &nData, IDR_FX1, _T("FX")))
 		return false;
 	hr=D3DXCreateEffect(device, pData, nData
 		,NULL,NULL,0,NULL,&effect,&error);
@@ -162,17 +173,17 @@ bool Setup()
 	handle = effect->GetAnnotationByName(handle, "name");
 	effect->GetString(handle, &texfile_script);
 #ifdef RESOURCE
-	if(!LoadResourceData(&pData, &nData, MAKEINTRESOURCE(IDR_JPEG1), _T("JPEG")))
+	if(!LoadResourceData(&pData, &nData, IDR_JPEG1, _T("JPEG")))
 		return false;	
 	hr=D3DXCreateTextureFromFileInMemory(device,pData,nData,&texture_bk);
 	if(FAILED(hr))
 		return false;
-	if(!LoadResourceData(&pData, &nData, MAKEINTRESOURCE(IDR_JPEG1), _T("JPEG")))
+	if(!LoadResourceData(&pData, &nData, IDR_JPEG1, _T("JPEG")))
 		return false;	
 	hr=D3DXCreateTextureFromFileInMemory(device,pData,nData,&texture_env);
 	if(FAILED(hr))
 		return false;
-	if(!LoadResourceData(&pData, &nData, MAKEINTRESOURCE(IDR_JPEG1), _T("JPEG")))
+	if(!LoadResourceData(&pData, &nData, IDR_JPEG1, _T("JPEG")))
 		return false;	
 	hr=D3DXCreateTextureFromFileInMemory(device,pData,nData,&texture_script);
 	if(FAILED(hr))
