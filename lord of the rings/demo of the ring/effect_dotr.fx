@@ -207,13 +207,13 @@ PS_OUTPUT ps_main(PS_INPUT input)
 PS_OUTPUT ps_main_out(PS_OUT_INPUT input)
 {
 	PS_OUTPUT output=(PS_OUTPUT)0;
-	float width=screensize.z;
-	float height=screensize.w;
+	float width=screensize.x;
+	float height=screensize.y;
 	float4 acc=0;
 	input.tex0+=float2(0.5/width,0.5/height);
 	acc.r=step(0.75,tex2D(sb,input.tex0).a)*0.3*glow;
 	//acc.gb=0.1*acc.r;
-	float offu=2./width,offv=2./height;
+	float offu=1./width,offv=1./height;
 	acc+=tex2D(sa,input.tex0);
 	acc+=tex2D(sa,input.tex0+float2(offu,0));
 	acc+=tex2D(sa,input.tex0+float2(-offu,0));

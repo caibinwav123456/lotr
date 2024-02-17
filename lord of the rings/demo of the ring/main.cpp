@@ -36,6 +36,7 @@ static inline void clamp_tdelta(float* tdelta,float inv_rfrshrt)
 }
 static bool parse_cmdline(char** cfg,char* buf,uint buflen)
 {
+	char* default_cfg="config.cfg";
 	LPSTR cmdline=GetCommandLine();
 	char *op_tag="--cfgfile=";
 	char* cfgstart=strstr(cmdline,op_tag);
@@ -56,7 +57,7 @@ static bool parse_cmdline(char** cfg,char* buf,uint buflen)
 			*cfg=cfgstart;
 	}
 	else
-		*cfg="config.cfg";
+		*cfg=default_cfg;
 	return true;
 }
 int WINAPI WinMain(HINSTANCE hInstance,

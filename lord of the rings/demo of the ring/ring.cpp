@@ -11,6 +11,7 @@
 #include "config_val_extern.h"
 #include "resource.h"
 #define MOUSE_DRAG 0.025
+#define MOUSE_HIDE 5
 
 extern int globe;
 int W=0,H=0;
@@ -38,6 +39,7 @@ IDirect3DVertexBuffer9* vb=0,*sqr=0;
 IDirect3DIndexBuffer9* ib=0;
 float scale=0,swell=0,red=0,glow=0;
 float dscale=0,dswell=0,dred=0,dglow=0;
+float hide_timeout=0;
 int autodemo=1,automode=1;
 char availabletechnique[10]="";
 int techlevel=0;
@@ -632,6 +634,8 @@ void onmdown(HWND hwnd)
 
 void onmove(HWND hwnd)
 {
+	hide_timeout=0;
+	::ShowCursor(TRUE);
 	POINT ptlast=pt;
 	::GetCursorPos(&pt);
 	float X=pt.x-ptlast.x;
@@ -664,6 +668,13 @@ void ProcessMouseMove(float tdelta)
 	if(moder)
 	{
 		lr=lr*Rx*Ry;
+	}
+	if(!(mode||moder))
+	{
+		if(hide_timeout>=MOUSE_HIDE)
+			ShowCursor(FALSE);
+		else
+			hide_timeout+=tdelta;
 	}
 }
 
