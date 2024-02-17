@@ -98,6 +98,6 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="effect_dotr.txt" />
+    <Text Include="effect_dotr.fx" />
   </ItemGroup>
 </Project>

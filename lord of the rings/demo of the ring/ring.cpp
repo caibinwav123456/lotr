@@ -63,6 +63,7 @@ IDirect3DTexture9* texture_script;
 #define TYPE_FLOAT 2
 #define TYPE_MAT   3
 #define TYPE_VEC   4
+DEFINE_STRING_VAL(fx_file,"effect_dotr.fx");
 
 bool PreInit(char* cfgfile)
 {
@@ -152,7 +153,7 @@ bool Setup()
 	hr=D3DXCreateEffect(device, pData, nData
 		,NULL,NULL,0,NULL,&effect,&error);
 #else
-	hr=D3DXCreateEffectFromFile(device, TEXT("effect_dotr.txt"),
+	hr=D3DXCreateEffectFromFile(device,fx_file.c_str(),
 		NULL,NULL,0,NULL,&effect,&error);
 #endif
 	if(FAILED(hr)&&error!=NULL)
@@ -173,22 +174,22 @@ bool Setup()
 	handle = effect->GetAnnotationByName(handle, "name");
 	effect->GetString(handle, &texfile_script);
 #ifdef RESOURCE
-	if(!LoadResourceData(&pData, &nData, IDR_JPEG1, _T("JPEG")))
-		return false;	
+	if(!LoadResourceData(&pData, &nData, IDR_JPEG1, _T("IMAGE")))
+		return false;
 	hr=D3DXCreateTextureFromFileInMemory(device,pData,nData,&texture_bk);
 	if(FAILED(hr))
 		return false;
-	if(!LoadResourceData(&pData, &nData, IDR_JPEG1, _T("JPEG")))
-		return false;	
+	if(!LoadResourceData(&pData, &nData, IDR_JPEG1, _T("IMAGE")))
+		return false;
 	hr=D3DXCreateTextureFromFileInMemory(device,pData,nData,&texture_env);
 	if(FAILED(hr))
 		return false;
-	if(!LoadResourceData(&pData, &nData, IDR_JPEG1, _T("JPEG")))
-		return false;	
+	if(!LoadResourceData(&pData, &nData, IDR_JPEG1, _T("IMAGE")))
+		return false;
 	hr=D3DXCreateTextureFromFileInMemory(device,pData,nData,&texture_script);
 	if(FAILED(hr))
 		return false;
-#else	
+#else
 	hr=D3DXCreateTextureFromFile(device,texfile_bk,&texture_bk);
 	if(FAILED(hr))
 		return false;

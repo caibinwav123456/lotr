@@ -1,0 +1,349 @@
+//
+//effect file for demo of the ring
+//
+
+//
+//globals
+//
+
+float4x4 worldview;
+float4x4 proj;
+float4 screensize;
+float4   lp;
+//Use this for mirror effect
+//float4   ep;
+float swell;
+float scale;
+float red;
+float glow;
+int index;
+
+//
+//textures
+//
+
+Texture Tex;//complex num and count
+Texture Mask;//intermediate output
+Texture Bk<string name="spheremap.png";>;//background
+Texture Env<string name="spheremap.png";>;//environment map
+Texture Script<string name="script1.dds";>;//script map
+
+//
+//samplers
+//
+
+//complex num and count
+sampler2D sa=sampler_state
+{
+	Texture=(Tex);
+	MinFilter=POINT;
+	MagFilter=POINT;
+	MipFilter=POINT;
+	AddressU=CLAMP;
+	AddressV=CLAMP;
+};
+
+//mask
+sampler2D sb=sampler_state
+{
+	Texture=(Mask);
+	MinFilter=LINEAR;
+	MagFilter=LINEAR;
+	MipFilter=LINEAR;
+	AddressU=CLAMP;
+	AddressV=CLAMP;
+};
+
+//script
+sampler2D sc=sampler_state
+{
+	Texture=(Script);
+	MinFilter=LINEAR;
+	MagFilter=LINEAR;
+	MipFilter=LINEAR;
+	AddressU=CLAMP;
+	AddressV=CLAMP;
+};
+
+//back
+sampler2D sbk=sampler_state
+{
+	Texture=(Bk);
+	MinFilter=LINEAR;
+	MagFilter=LINEAR;
+	MipFilter=LINEAR;
+	AddressU=CLAMP;
+	AddressV=CLAMP;
+};
+
+//env
+sampler2D sd=sampler_state
+{
+	Texture=(Env);
+	MinFilter=LINEAR;
+	MagFilter=LINEAR;
+	MipFilter=LINEAR;
+	AddressU=CLAMP;
+	AddressV=CLAMP;
+};
+
+//
+//structures
+//
+
+struct VS_INPUT
+{
+	float4 inpos:POSITION;
+	float3 norm :NORMAL0;
+	float3 norm1:NORMAL1;
+	float2 tex  :TEXCOORD0;
+};
+
+struct VS_OUTPUT
+{
+	float4 outpos:POSITION;
+	float4 outn  :TEXCOORD1;//COLOR0;
+	float4 outn1 :TEXCOORD2;//COLOR1;
+	float3 norm  :TEXCOORD3;
+	float3 tan1  :TEXCOORD4;
+	float3 tan2  :TEXCOORD5;
+	float2 tex0  :TEXCOORD0;
+};
+
+struct PS_INPUT
+{
+	float4 inpos :POSITION;
+	float4 light :TEXCOORD1;//COLOR0;
+	float4 eye   :TEXCOORD2;//COLOR1;
+	float3 norm  :TEXCOORD3;
+	float3 tan1  :TEXCOORD4;
+	float3 tan2  :TEXCOORD5;
+	float2 tex0  :TEXCOORD0;
+};
+
+struct PS_OUTPUT
+{
+	float4 color :COLOR;
+};
+
+struct PS_OUT_INPUT
+{
+	float4 inpos :POSITION;
+	float4 light :COLOR0;//TEXCOORD1;
+	float4 eye   :COLOR1;//TEXCOORD2;
+	float2 tex0  :TEXCOORD0;
+};
+
+///////////////////vertex shader//////////////
+
+//
+//vs main function
+//
+
+VS_OUTPUT vs_main(VS_INPUT input)
+{
+	VS_OUTPUT output=(VS_OUTPUT)0;
+	float4 pos=input.inpos;
+	pos.xyz+=input.norm*swell;
+	float4 position=mul(pos,worldview);
+	float3 normt=mul(float4(input.norm,0),worldview).xyz;
+	float3 normt1=mul(float4(input.norm1,0),worldview).xyz;
+	float3 norm2=cross(normt,normt1);
+	float3 lspace=lp.xyz;//-position.xyz/position.w;//;
+	float3 espace=-position.xyz/position.w;
+	output.outpos=mul(position,proj);
+	output.outn=float4(normalize(lspace)/*/2+0.5*/,0);//1./length(outtmp)
+	output.outn1=float4(normalize(espace)/*/2+0.5*/,0);
+	output.norm=normt;
+	output.tan1=normt1;
+	output.tan2=norm2;
+	output.tex0=input.tex;
+	return output;
+}
+
+VS_OUTPUT vs_main_out(VS_INPUT input)
+{
+	VS_OUTPUT output=(VS_OUTPUT)0;
+	output.outpos=input.inpos;
+	output.tex0=input.tex;
+	return output;
+}
+
+/////////////////pixel shader////////////////
+
+//
+//ps main function
+//
+
+PS_OUTPUT ps_main(PS_INPUT input)
+{
+	PS_OUTPUT output=(PS_OUTPUT)0;
+	float3 l=normalize(input.light.xyz/**2-1*/);
+//	float ls=input.light.w*10;
+	float3 e=normalize(input.eye.xyz/**2-1*/);
+	float4 px=tex2D(sc,input.tex0);
+	float3 pxn=float3(1/*px.z*10*/,px.y*scale,-px.x*scale);
+	pxn=normalize(pxn);//input.norm+0.001*
+	pxn=mul(pxn,float3x3(input.norm,input.tan1,input.tan2));
+	float3 ref=-reflect(e,pxn);
+	float2 tc=-ref.xy/sqrt(1-ref.z);
+	float4 c=3*tex2D(sd,tc*0.354+float2(0.5,0.5));//*0.8+0.2;
+	float spec=clamp(pow(clamp(dot(l,ref)*1.02,0,1.02),100),0,1);
+	float result=(dot(pxn,l));//,0,1
+	float4 re=abs(result-0.1)*float4(0.6,0.6,1/*0.85*/,1)+float4(0.4,0.4,0/*0.15*/,0)*(result-0.1);
+	float4 cn=re*lerp(0,float4(0.95,0.95,0.2,1),c);
+	float4 cr=lerp(float4(1,1,0.1,1),1,c);//c*float4(1,0.2,0.2,1);
+	float4 co=lerp(cn,cr,px.w*red);
+	output.color=lerp(co,1,spec);	
+	output.color.a=px.w+0.5;
+
+	return output;
+}
+
+//
+//ps out main function
+//
+
+PS_OUTPUT ps_main_out(PS_OUT_INPUT input)
+{
+	PS_OUTPUT output=(PS_OUTPUT)0;
+	float width=screensize.z;
+	float height=screensize.w;
+	float4 acc=0;
+	input.tex0+=float2(0.5/width,0.5/height);
+	acc.r=step(0.75,tex2D(sb,input.tex0).a)*0.3*glow;
+	//acc.gb=0.1*acc.r;
+	float offu=2./width,offv=2./height;
+	acc+=tex2D(sa,input.tex0);
+	acc+=tex2D(sa,input.tex0+float2(offu,0));
+	acc+=tex2D(sa,input.tex0+float2(-offu,0));
+	acc+=tex2D(sa,input.tex0+float2(0,offv));
+	acc+=tex2D(sa,input.tex0+float2(0,-offv));
+	acc+=tex2D(sa,input.tex0+float2(offu,offv));
+	acc+=tex2D(sa,input.tex0+float2(offu,-offv));
+	acc+=tex2D(sa,input.tex0+float2(-offu,offv));
+	acc+=tex2D(sa,input.tex0+float2(-offu,-offv));
+	acc*=(1./9*0.995);//
+	output.color=acc;
+
+	return output;
+}
+
+PS_OUTPUT ps_main_out_v3_0(PS_OUT_INPUT input)
+{
+	PS_OUTPUT output=(PS_OUTPUT)0;
+	float width=screensize.z;
+	float height=screensize.w;
+	float4 acc=0;
+	input.tex0+=float2(0.5/width,0.5/height);
+	acc.r=0;
+	float offu=1./width,offv=1./height;
+	int span=height/8;
+	float ac=0;
+	for(int i=-span;i<=span;i++)
+	{
+		float x=(float)i/span*3;
+		float co=exp(-x*x);
+		ac+=co;
+		float2 t=input.tex0+float2(offu*i,0);
+		acc.r+=co*(step(0.75,tex2Dlod(sb,float4(t,0,0)).a)*10.0*glow);
+	}
+	acc/=ac;
+	output.color=acc;
+
+	return output;
+}
+
+PS_OUTPUT ps_main_out_v3_1(PS_OUT_INPUT input)
+{
+	PS_OUTPUT output=(PS_OUTPUT)0;
+	float width=screensize.x;
+	float height=screensize.y;
+	float4 acc=0;
+	input.tex0+=float2(0.5/width,0.5/height);
+	acc.r=0;
+	float offu=1./width,offv=1./height;
+	int span=height/8;
+	float ac=0;
+	for(int i=-span;i<=span;i++)
+	{
+		float x=(float)i/span*3;
+		float co=exp(-x*x);
+		ac+=co;
+		float2 t=input.tex0+float2(0,offv*i);
+		acc+=co*tex2Dlod(sa,float4(t,0,0));
+	}
+	acc/=ac;
+	output.color=acc;
+
+	return output;
+}
+
+PS_OUTPUT ps_main_final(PS_OUT_INPUT input)
+{
+	PS_OUTPUT output=(PS_OUTPUT)0;
+	float4 c=tex2D(sb,input.tex0);
+	float4 color=c+tex2D(sa,input.tex0);
+	float4 colorbk=tex2D(sbk,input.tex0);
+	float4 color2=lerp(colorbk,1,color);
+	output.color=lerp(color2,color,step(0.25,c.a));
+
+	return output;
+}
+
+PS_OUTPUT ps_main_final_v3(PS_OUT_INPUT input)
+{
+	PS_OUTPUT output=(PS_OUTPUT)0;
+	float4 c=tex2D(sb,input.tex0);
+	float4 cr=tex2D(sa,input.tex0);
+	cr=clamp(cr*0.4,0,1);
+	float4 color=lerp(c,1,cr);
+	float4 colorbk=tex2D(sbk,input.tex0);
+	float4 color2=lerp(colorbk,1,color);
+	output.color=lerp(color2,color,step(0.25,c.a));
+
+	return output;
+}
+
+Technique T0
+{
+	Pass P0
+	{
+		VertexShader=compile vs_2_0 vs_main();
+		PixelShader=compile ps_2_0 ps_main();
+	}
+	Pass P1
+	{
+		VertexShader=compile vs_2_0 vs_main_out();
+		PixelShader=compile ps_2_0 ps_main_out();
+	}
+	Pass P2
+	{
+		VertexShader=compile vs_2_0 vs_main_out();
+		PixelShader=compile ps_2_0 ps_main_final();
+	}
+}
+
+Technique T1
+{
+	Pass P0
+	{
+		VertexShader=compile vs_3_0 vs_main();
+		PixelShader=compile ps_3_0 ps_main();
+	}
+	Pass P1_0
+	{
+		VertexShader=compile vs_3_0 vs_main_out();
+		PixelShader=compile ps_3_0 ps_main_out_v3_0();
+	}
+	Pass P1_1
+	{
+		VertexShader=compile vs_3_0 vs_main_out();
+		PixelShader=compile ps_3_0 ps_main_out_v3_1();
+	}
+	Pass P2
+	{
+		VertexShader=compile vs_3_0 vs_main_out();
+		PixelShader=compile ps_3_0 ps_main_final_v3();
+	}
+}
