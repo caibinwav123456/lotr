@@ -53,6 +53,9 @@
     <ResourceCompile Include="Script1.rc">
       <Filter>Source Files</Filter>
     </ResourceCompile>
+    <ResourceCompile Include="Script1_ResVersion.rc">
+      <Filter>Source Files</Filter>
+    </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mesh.h">
