@@ -549,6 +549,8 @@
     <ClInclude Include="config_val_extern.h" />
     <ClInclude Include="mesh.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="resource_inner.h" />
+    <ClInclude Include="resource_normal.h" />
     <ClInclude Include="ring.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>

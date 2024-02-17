@@ -9,6 +9,7 @@
 #include "config.h"
 #include "config_val.h"
 #include "config_val_extern.h"
+#include "resource.h"
 #define MOUSE_DRAG 0.025
 
 extern int globe;
