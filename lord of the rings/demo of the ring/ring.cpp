@@ -9,6 +9,7 @@
 #include "config.h"
 #include "config_val.h"
 #include "config_val_extern.h"
+#include "UnZip.h"
 #include "resource.h"
 #define MOUSE_DRAG 0.025
 #define MOUSE_HIDE 5

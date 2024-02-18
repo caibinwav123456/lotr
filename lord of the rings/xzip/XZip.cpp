@@ -2556,7 +2556,7 @@ unsigned int TZip::write(const char *buf, unsigned int size)
 	}
 	else if (hfout!=0)
 	{ 
-		DWORD writ = 0; 
+		DWORD writ = 0;
 		WriteFile(hfout,buf,size,&writ,NULL);
 		return writ;
 	}

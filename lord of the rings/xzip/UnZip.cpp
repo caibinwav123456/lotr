@@ -74,3 +74,40 @@ BOOL UnZipToDir(CString strZipFile, CString strDir, CallBackOnUnzipItem cbfOnUnz
 
 	return ret;
 }
+BOOL UnZipInMemory(void* buf,int size,void*& dstbuf,int& dstsize)
+{
+	if(size<4)
+		return FALSE;
+	BOOL ret=TRUE;
+	char *srcbuf=NULL;
+	dstsize=*(DWORD*)buf;
+	dstbuf=new char[dstsize];
+	size-=sizeof(DWORD);
+	srcbuf=(char*)buf+sizeof(DWORD);
+	HZIP hz=OpenZip(srcbuf,size,ZIP_MEMORY);
+	if(!hz)
+		return FALSE;
+	ZIPENTRYW ze;
+
+	memset(&ze,0,sizeof(ze));
+	if(GetZipItem(hz,-1,&ze)!=ZR_OK)
+	{
+		ret=FALSE;
+		goto end;
+	}
+	if(ze.index<=0)
+	{
+		ret=FALSE;
+		goto end;
+	}
+	if(GetZipItem(hz,0,&ze)!=ZR_OK)
+	{
+		ret=FALSE;
+		goto end;
+	}
+	if(UnzipItem(hz,0,dstbuf,dstsize,ZIP_MEMORY)!=ZR_OK)
+		ret=FALSE;
+end:
+	CloseZip(hz);
+	return ret;
+}

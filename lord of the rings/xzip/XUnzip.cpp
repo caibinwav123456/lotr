@@ -2835,6 +2835,11 @@ size_t lufread(void *ptr,size_t size,size_t n,LUFILE *stream)
     if (!res) stream->herr=true;
     return red/size;
   }
+  if(stream->pos>=stream->len)
+  {
+      stream->herr=true;
+      return 0;
+  }
   if (stream->pos+toread > stream->len) toread = stream->len-stream->pos;
   memcpy(ptr, (char*)stream->buf + stream->pos, toread); DWORD red = toread;
   stream->pos += red;
@@ -4049,32 +4054,6 @@ ZRESULT TUnzip::Unzip(int index,void *dst,unsigned int len,DWORD flags)
 { 
 	if (flags!=ZIP_MEMORY && flags!=ZIP_FILENAME && flags!=ZIP_HANDLE) 
 		return ZR_ARGS;
-	if (flags==ZIP_MEMORY)
-	{ 
-		if (index!=currentfile)
-		{ 
-			if (currentfile!=-1) 
-				unzCloseCurrentFile(uf); 
-			currentfile=-1;
-			if (index>=(int)uf->gi.number_entry) 
-				return ZR_ARGS;
-			if (index<(int)uf->num_file) 
-				unzGoToFirstFile(uf);
-			while ((int)uf->num_file<index) 
-				unzGoToNextFile(uf);
-			unzOpenCurrentFile(uf); 
-			currentfile=index;
-		}
-		int res = unzReadCurrentFile(uf,dst,len);
-		if (res>0) 
-			return ZR_MORE;
-		unzCloseCurrentFile(uf); 
-		currentfile=-1;
-		if (res==0) 
-			return ZR_OK;
-		else 
-			return ZR_FLATE;
-	}
 
 	// otherwise we're writing to a handle or a file
 	if (currentfile!=-1) 
@@ -4092,7 +4071,7 @@ ZRESULT TUnzip::Unzip(int index,void *dst,unsigned int len,DWORD flags)
 	// zipentry=directory is handled specially
 	if ((ze.attr & FILE_ATTRIBUTE_DIRECTORY) != 0)
 	{ 
-		if (flags==ZIP_HANDLE) 
+		if (flags==ZIP_MEMORY||flags==ZIP_HANDLE)
 			return ZR_OK; // don't do anything
 #ifdef _UNICODE
 		TCHAR uname[MAX_PATH];
@@ -4106,7 +4085,13 @@ ZRESULT TUnzip::Unzip(int index,void *dst,unsigned int len,DWORD flags)
 
 	// otherwise, we write the zipentry to a file/handle
 	HANDLE h;
-	if (flags==ZIP_HANDLE) 
+    int buf_len;
+    if(flags==ZIP_MEMORY)
+    {
+        h = dst;
+        buf_len = len;
+    }
+	else if (flags==ZIP_HANDLE) 
 		h=dst;
 	else
 	{ 
@@ -4151,22 +4136,39 @@ ZRESULT TUnzip::Unzip(int index,void *dst,unsigned int len,DWORD flags)
 		}
 		if (res==0) 
 			break;
-		DWORD writ; 
-		BOOL bres = WriteFile(h,buf,res,&writ,NULL);
+		DWORD writ;
+        BOOL bres;
+        if(flags==ZIP_MEMORY)
+        {
+            if(buf_len<res)
+                bres=FALSE;
+            else
+            {
+                memcpy(h,buf,res);
+                h=((char*)h)+res;
+                buf_len-=res;
+                bres=TRUE;
+            }
+        }
+        else
+    		bres = WriteFile(h,buf,res,&writ,NULL);
 		if (!bres) 
 		{
 			haderr=true; 
 			break;
 		}
 	}
-	bool settime=false;
-	DWORD type = GetFileType(h); 
-	if (type==FILE_TYPE_DISK && !haderr) 
-		settime=true;
-	if (settime) 
-		SetFileTime(h,&ze.ctime,&ze.atime,&ze.mtime);
-	if (flags!=ZIP_HANDLE) 
-		CloseHandle(h);
+    if(flags!=ZIP_MEMORY)
+    {
+	    bool settime=false;
+	    DWORD type = GetFileType(h); 
+	    if (type==FILE_TYPE_DISK && !haderr) 
+		    settime=true;
+	    if (settime) 
+		    SetFileTime(h,&ze.ctime,&ze.atime,&ze.mtime);
+	    if (flags!=ZIP_HANDLE) 
+		    CloseHandle(h);
+    }
 	unzCloseCurrentFile(uf);
 	if (haderr) 
 		return ZR_WRITE;
