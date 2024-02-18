@@ -90,8 +90,9 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+#ifndef CONFIG_X64
 #define _USE_32BIT_TIME_T	//+++1.2
-
+#endif
 
 #define STRICT
 #define WIN32_LEAN_AND_MEAN

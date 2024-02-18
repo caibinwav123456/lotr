@@ -1,6 +1,14 @@
-#include "stdafx.h"
+#ifndef STRICT
+#define STRICT
+#endif
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
+#include <shlwapi.h>
+#include <stdio.h>
+#include <string.h>
+#include <assert.h>
 #include "UnZip.h"
-#include "xzip/XUnzip.h"
+#include "XUnzip.h"
 
 BOOL UnZipToDir(CString strZipFile, CString strDir, CallBackOnUnzipItem cbfOnUnzipItem)
 {
@@ -27,7 +35,7 @@ BOOL UnZipToDir(CString strZipFile, CString strDir, CallBackOnUnzipItem cbfOnUnz
 		memset(&ze, 0, sizeof(ze));
 		zr = GetZipItem(hz, -1, &ze);
 
-		_ASSERT(ZR_OK == zr);
+		assert(ZR_OK == zr);
 
 		int num = ze.index;
 		int i;
@@ -41,15 +49,13 @@ BOOL UnZipToDir(CString strZipFile, CString strDir, CallBackOnUnzipItem cbfOnUnz
 				continue;
 			}
 
-			TRACE(_T("item name %s\n"), ze.name);
-
 			CString strFn(ze.name);
 			if (cbfOnUnzipItem)
 			{
 				(*cbfOnUnzipItem)(strFn);
 			}
 			CString strFullPathName = strFn;
-			strFullPathName.Replace('/', '\\');
+			strFullPathName.Replace(_T('/'), _T('\\'));
 			CString strDir2 = strDir;
 			if(strDir2.Right(1)!=_T("\\"))
 				strDir2+=_T("\\");

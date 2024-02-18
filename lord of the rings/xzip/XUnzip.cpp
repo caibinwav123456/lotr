@@ -89,9 +89,11 @@
 //       own source and binary releases.
 //
 ///////////////////////////////////////////////////////////////////////////////
-#include "stdafx.h"
+//#include "stdafx.h"
 
+#ifndef CONFIG_X64
 #define _USE_32BIT_TIME_T	//+++1.2
+#endif
 
 #ifndef STRICT
 #define STRICT

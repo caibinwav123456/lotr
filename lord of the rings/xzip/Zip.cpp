@@ -1,7 +1,12 @@
-#include "stdafx.h"
+#ifndef STRICT
+#define STRICT
+#endif
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
+#include <shlwapi.h>
+#include <assert.h>
 #include "Zip.h"
-#include "xzip/XZip.h"
-#include "shlwapi.h"
+#include "XZip.h"
 
 BOOL AddDir(CString strDirSrc, CString strDir, HZIP hzip)
 {
@@ -36,34 +41,6 @@ BOOL AddDir(CString strDirSrc, CString strDir, HZIP hzip)
 	return bRet;
 }
 
-void DeleteDir(CString strDir)
-{
-	if(strDir.Right(1) != _T("\\"))
-		strDir+=_T("\\");
-	WIN32_FIND_DATA file;
-	HANDLE handle=FindFirstFile(strDir + _T("*.*"),&file);
-	BOOL bFind = TRUE;
-	while(handle!=INVALID_HANDLE_VALUE && bFind)
-	{
-		CString strFileName = strDir +file.cFileName;
-		if(CString(file.cFileName) != _T(".") && CString(file.cFileName) != _T(".."))
-		{
-			if(PathIsDirectory(strFileName))
-			{
-				DeleteDir(strFileName);
-			}
-			else
-			{
-				DeleteFile(strFileName);
-			}
-		}
-		bFind = FindNextFile(handle,&file);		
-	}
-	FindClose(handle);
-	BOOL bRet = RemoveDirectory(strDir.Left(strDir.GetLength()-1));
-	DWORD dw = GetLastError();
-}
-
 BOOL ZipToDir(CString strZipFile, CString strDir)
 {
 	BOOL ret = PathFileExists(strDir);
@@ -84,7 +61,7 @@ BOOL ZipToDir(CString strZipFile, CString strDir)
 		BOOL bSuc = AddDir(strDir, _T(""), hz);
 
 
-		_ASSERT(bSuc);
+		assert(bSuc);
 
 		CloseZip(hz);
 	}
