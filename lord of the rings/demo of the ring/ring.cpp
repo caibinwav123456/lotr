@@ -100,15 +100,52 @@ void SetUserValue(char *name,void* val,int type)
 		break;
 	}
 }
+struct RSRCData
+{
+	void* ptr;
+	int len;
+	RSRCData():ptr(NULL),len(0){}
+	~RSRCData()
+	{
+		clear();
+	}
+	void clear()
+	{
+		if(ptr)
+		{
+			delete[] (char*)ptr;
+			ptr=NULL;
+		}
+		len=0;
+	}
+	RSRCData(RSRCData& data)
+	{
+		ptr=data.ptr;
+		len=data.len;
+		data.ptr=NULL;
+		data.len=0;
+	}
+	void operator=(RSRCData& data)
+	{
+		clear();
+		ptr=data.ptr;
+		len=data.len;
+		data.ptr=NULL;
+		data.len=0;
+	}
+};
 #ifdef RESOURCE
-bool LoadResourceData(LPVOID* pData, int* nData, int nID, LPCTSTR strType)
+bool LoadResourceData(RSRCData& rdata,int nID,LPCTSTR strType)
 {
 	HRSRC hRsrc=FindResource(NULL,MAKEINTRESOURCE(nID),strType);
 	if(hRsrc==NULL)
 		return false;
 	HGLOBAL h=LoadResource(NULL,hRsrc);
-	*pData=LockResource(h);
-	*nData=SizeofResource(NULL,hRsrc);
+	void* src=LockResource(h);
+	int srclen=SizeofResource(NULL,hRsrc);
+	rdata.clear();
+	if(!UnZipInMemory(src,srclen,rdata.ptr,rdata.len))
+		return false;
 	return true;
 }
 #endif
@@ -150,12 +187,13 @@ bool Setup()
 	}
 	ID3DXBuffer* error=0;
 #ifdef RESOURCE
-	LPVOID pData;
-	int nData;
-	if(!LoadResourceData(&pData, &nData, IDR_FX1, _T("FX")))
-		return false;
-	hr=D3DXCreateEffect(device, pData, nData
-		,NULL,NULL,0,NULL,&effect,&error);
+	{
+		RSRCData rdata;
+		if(!LoadResourceData(rdata,IDR_FX_DOTR,_T("FX")))
+			return false;
+		hr=D3DXCreateEffect(device, rdata.ptr,rdata.len
+			,NULL,NULL,0,NULL,&effect,&error);
+	}
 #else
 	hr=D3DXCreateEffectFromFile(device,fx_file.c_str(),
 		NULL,NULL,0,NULL,&effect,&error);
@@ -178,21 +216,24 @@ bool Setup()
 	handle = effect->GetAnnotationByName(handle, "name");
 	effect->GetString(handle, &texfile_script);
 #ifdef RESOURCE
-	if(!LoadResourceData(&pData, &nData, IDR_JPEG1, _T("IMAGE")))
-		return false;
-	hr=D3DXCreateTextureFromFileInMemory(device,pData,nData,&texture_bk);
-	if(FAILED(hr))
-		return false;
-	if(!LoadResourceData(&pData, &nData, IDR_JPEG1, _T("IMAGE")))
-		return false;
-	hr=D3DXCreateTextureFromFileInMemory(device,pData,nData,&texture_env);
-	if(FAILED(hr))
-		return false;
-	if(!LoadResourceData(&pData, &nData, IDR_JPEG1, _T("IMAGE")))
-		return false;
-	hr=D3DXCreateTextureFromFileInMemory(device,pData,nData,&texture_script);
-	if(FAILED(hr))
-		return false;
+	{
+		RSRCData rdata;
+		if(!LoadResourceData(rdata,IDR_IMAGE_BK,_T("IMAGE")))
+			return false;
+		hr=D3DXCreateTextureFromFileInMemory(device,rdata.ptr,rdata.len,&texture_bk);
+		if(FAILED(hr))
+			return false;
+		if(!LoadResourceData(rdata,IDR_IMAGE_BK,_T("IMAGE")))
+			return false;
+		hr=D3DXCreateTextureFromFileInMemory(device,rdata.ptr,rdata.len,&texture_env);
+		if(FAILED(hr))
+			return false;
+		if(!LoadResourceData(rdata,IDR_IMAGE_SCRIPT,_T("IMAGE")))
+			return false;
+		hr=D3DXCreateTextureFromFileInMemory(device,rdata.ptr,rdata.len,&texture_script);
+		if(FAILED(hr))
+			return false;
+	}
 #else
 	hr=D3DXCreateTextureFromFile(device,texfile_bk,&texture_bk);
 	if(FAILED(hr))

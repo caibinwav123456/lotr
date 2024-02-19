@@ -4,7 +4,12 @@
 #include "UnZip.h"
 #include "stdio.h"
 #include "tchar.h"
-#define safe_delete(ptr) if(ptr!=NULL)delete[] ptr
+#define safe_delete(ptr) \
+	if(ptr!=NULL) \
+	{ \
+		delete[] ptr; \
+		ptr=NULL; \
+	}
 TCHAR *srcfile=NULL,*dstfile=NULL;
 bool bdecompress=false;
 bool binmem=false;

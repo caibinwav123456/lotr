@@ -203,7 +203,7 @@
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <OutputFile>.\Debug/demo of the ring.bsc</OutputFile>
+      <OutputFile>$(OutDir)$(TargetName).bsc</OutputFile>
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_Res|Win32'">
@@ -244,12 +244,17 @@
       <DataExecutionPrevention>
       </DataExecutionPrevention>
       <TargetMachine>MachineX86</TargetMachine>
-      <AdditionalLibraryDirectories>$(ProjectDir)lib\$(Configuration);$(SolutionDir)lib\$(Configuration)\;D:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)lib\Debug\;$(SolutionDir)lib\Debug\;D:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <OutputFile>.\Debug/demo of the ring.bsc</OutputFile>
+      <OutputFile>$(OutDir)$(TargetName).bsc</OutputFile>
     </Bscmake>
+    <PreBuildEvent>
+      <Command>"$(ProjectDir)stage\$(Configuration)\zipper.exe" -m Script1.dds Script1.dds.zip
+"$(ProjectDir)stage\$(Configuration)\zipper.exe" -m spheremap.png spheremap.png.zip
+"$(ProjectDir)stage\$(Configuration)\zipper.exe" -m effect_dotr.fx effect_dotr.fx.zip</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Midl>
@@ -291,7 +296,7 @@
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <OutputFile>.\Debug/demo of the ring.bsc</OutputFile>
+      <OutputFile>$(OutDir)$(TargetName).bsc</OutputFile>
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_Res|x64'">
@@ -330,12 +335,17 @@
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>
       </DataExecutionPrevention>
-      <AdditionalLibraryDirectories>$(ProjectDir)lib\$(Platform)\$(Configuration);$(SolutionDir)lib\$(Platform)\$(Configuration)\;D:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)lib\$(Platform)\Debug\;$(SolutionDir)lib\$(Platform)\Debug\;D:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <OutputFile>.\Debug/demo of the ring.bsc</OutputFile>
+      <OutputFile>$(OutDir)$(TargetName).bsc</OutputFile>
     </Bscmake>
+    <PreBuildEvent>
+      <Command>"$(ProjectDir)stage\$(Platform)\$(Configuration)\zipper.exe" -m Script1.dds Script1.dds.zip
+"$(ProjectDir)stage\$(Platform)\$(Configuration)\zipper.exe" -m spheremap.png spheremap.png.zip
+"$(ProjectDir)stage\$(Platform)\$(Configuration)\zipper.exe" -m effect_dotr.fx effect_dotr.fx.zip</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Midl>
@@ -378,7 +388,7 @@
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <OutputFile>.\Release/demo of the ring.bsc</OutputFile>
+      <OutputFile>$(OutDir)$(TargetName).bsc</OutputFile>
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_Res|Win32'">
@@ -419,13 +429,18 @@
       <DataExecutionPrevention>
       </DataExecutionPrevention>
       <TargetMachine>MachineX86</TargetMachine>
-      <AdditionalLibraryDirectories>$(ProjectDir)lib\$(Configuration);$(SolutionDir)lib\$(Configuration)\;D:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)lib\Release\;$(SolutionDir)lib\Release\;D:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <OutputFile>.\Release/demo of the ring.bsc</OutputFile>
+      <OutputFile>$(OutDir)$(TargetName).bsc</OutputFile>
     </Bscmake>
+    <PreBuildEvent>
+      <Command>"$(ProjectDir)stage\$(Configuration)\zipper.exe" -m Script1.dds Script1.dds.zip
+"$(ProjectDir)stage\$(Configuration)\zipper.exe" -m spheremap.png spheremap.png.zip
+"$(ProjectDir)stage\$(Configuration)\zipper.exe" -m effect_dotr.fx effect_dotr.fx.zip</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Midl>
@@ -468,7 +483,7 @@
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <OutputFile>.\Release/demo of the ring.bsc</OutputFile>
+      <OutputFile>$(OutDir)$(TargetName).bsc</OutputFile>
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_Res|x64'">
@@ -507,13 +522,18 @@
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>
       </DataExecutionPrevention>
-      <AdditionalLibraryDirectories>$(ProjectDir)lib\$(Platform)\$(Configuration);$(SolutionDir)lib\$(Platform)\$(Configuration)\;D:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)lib\$(Platform)\Release\;$(SolutionDir)lib\$(Platform)\Release\;D:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <OutputFile>.\Release/demo of the ring.bsc</OutputFile>
+      <OutputFile>$(OutDir)$(TargetName).bsc</OutputFile>
     </Bscmake>
+    <PreBuildEvent>
+      <Command>"$(ProjectDir)stage\$(Platform)\$(Configuration)\zipper.exe" -m Script1.dds Script1.dds.zip
+"$(ProjectDir)stage\$(Platform)\$(Configuration)\zipper.exe" -m spheremap.png spheremap.png.zip
+"$(ProjectDir)stage\$(Platform)\$(Configuration)\zipper.exe" -m effect_dotr.fx effect_dotr.fx.zip</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\common files\d3dfont.cpp" />
@@ -562,6 +582,11 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="effect_dotr.fx" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="effect_dotr.fx.zip" />
+    <None Include="Script1.dds.zip" />
+    <None Include="spheremap.png.zip" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

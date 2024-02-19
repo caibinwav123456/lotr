@@ -106,4 +106,9 @@
   <ItemGroup>
     <Text Include="effect_dotr.fx" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Script1.dds.zip" />
+    <None Include="spheremap.png.zip" />
+    <None Include="effect_dotr.fx.zip" />
+  </ItemGroup>
 </Project>
