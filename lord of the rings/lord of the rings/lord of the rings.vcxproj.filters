@@ -43,6 +43,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="effect_lotr.txt" />
+    <Text Include="effect_lotr.fx" />
   </ItemGroup>
 </Project>

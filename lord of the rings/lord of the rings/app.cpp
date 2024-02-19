@@ -79,7 +79,7 @@ bool Setup()
 	hr=D3DXCreateEffect(device, pData, nData
 		,NULL,NULL,0,NULL,&effect,&error);
 #else
-	hr=D3DXCreateEffectFromFile(device, TEXT("effect_lotr.txt"),
+	hr=D3DXCreateEffectFromFile(device, TEXT("effect_lotr.fx"),
 		NULL,NULL,0,NULL,&effect,&error);
 #endif
 	if(FAILED(hr))
