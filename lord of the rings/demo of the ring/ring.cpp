@@ -673,11 +673,19 @@ void onmdown(HWND hwnd)
 	::GetCursorPos(&pt);
 	::SetCapture(hwnd);
 }
-
+void DisplayCursor(BOOL bDisp)
+{
+	static BOOL bShow=TRUE;
+	if(bDisp!=bShow)
+	{
+		::ShowCursor(bDisp);
+		bShow=bDisp;
+	}
+}
 void onmove(HWND hwnd)
 {
 	hide_timeout=0;
-	::ShowCursor(TRUE);
+	DisplayCursor(TRUE);
 	POINT ptlast=pt;
 	::GetCursorPos(&pt);
 	float X=pt.x-ptlast.x;
@@ -714,7 +722,7 @@ void ProcessMouseMove(float tdelta)
 	if(!(mode||moder))
 	{
 		if(hide_timeout>=MOUSE_HIDE)
-			ShowCursor(FALSE);
+			DisplayCursor(FALSE);
 		else
 			hide_timeout+=tdelta;
 	}
