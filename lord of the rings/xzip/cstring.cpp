@@ -11,11 +11,11 @@ CString::CString(const CString& other):std::basic_string<TCHAR>(other)
 }
 void CString::operator=(const TCHAR* str)
 {
-	((std::basic_string<TCHAR>*)this)->operator=(str);
+	std::basic_string<TCHAR>::operator=(str);
 }
 void CString::operator=(const CString& str)
 {
-	((std::basic_string<TCHAR>*)this)->operator=(str);
+	std::basic_string<TCHAR>::operator=(str);
 }
 CString::operator const TCHAR*() const
 {
@@ -32,11 +32,11 @@ CString CString::operator+(const TCHAR* other) const
 }
 void CString::operator+=(const CString& other)
 {
-	((std::basic_string<TCHAR>*)this)->operator+=(other);
+	std::basic_string<TCHAR>::operator+=(other);
 }
 void CString::operator+=(const TCHAR* other)
 {
-	((std::basic_string<TCHAR>*)this)->operator+=(other);
+	std::basic_string<TCHAR>::operator+=(other);
 }
 
 bool CString::operator==(const CString& other) const
