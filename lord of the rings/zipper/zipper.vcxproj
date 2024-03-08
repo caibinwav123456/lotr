@@ -100,7 +100,8 @@
       <AdditionalDependencies>xzip.lib;shlwapi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>md "$(SolutionDir)demo of the ring\stage\$(Configuration)_Res"
+      <Command>md "$(SolutionDir)demo of the ring\stage"
+md "$(SolutionDir)demo of the ring\stage\$(Configuration)_Res"
 xcopy "$(SolutionDir)$(Configuration)\$(TargetFileName)" "$(SolutionDir)demo of the ring\stage\$(Configuration)_Res" /Y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -123,7 +124,8 @@ xcopy "$(SolutionDir)$(Configuration)\$(TargetFileName)" "$(SolutionDir)demo of 
       <AdditionalDependencies>xzip.lib;shlwapi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>md "$(SolutionDir)demo of the ring\stage\$(Configuration)_Res"
+      <Command>md "$(SolutionDir)demo of the ring\stage"
+md "$(SolutionDir)demo of the ring\stage\$(Configuration)_Res"
 xcopy "$(SolutionDir)$(Configuration)\$(TargetFileName)" "$(SolutionDir)demo of the ring\stage\$(Configuration)_Res" /Y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -142,8 +144,10 @@ xcopy "$(SolutionDir)$(Configuration)\$(TargetFileName)" "$(SolutionDir)demo of 
       <AdditionalDependencies>xzip.lib;shlwapi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>md "$(SolutionDir)demo of the ring\stage\$(Platform)\$(Configuration)_Res"
-xcopy "$(SolutionDir)$(Configuration)\$(TargetFileName)" "$(SolutionDir)demo of the ring\stage\$(Platform)\$(Configuration)_Res" /Y</Command>
+      <Command>md "$(SolutionDir)demo of the ring\stage"
+md "$(SolutionDir)demo of the ring\stage\$(Platform)"
+md "$(SolutionDir)demo of the ring\stage\$(Platform)\$(Configuration)_Res"
+xcopy "$(SolutionDir)$(Platform)\$(Configuration)\$(TargetFileName)" "$(SolutionDir)demo of the ring\stage\$(Platform)\$(Configuration)_Res" /Y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -165,8 +169,10 @@ xcopy "$(SolutionDir)$(Configuration)\$(TargetFileName)" "$(SolutionDir)demo of 
       <AdditionalDependencies>xzip.lib;shlwapi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>md "$(SolutionDir)demo of the ring\stage\$(Platform)\$(Configuration)_Res"
-xcopy "$(SolutionDir)$(Configuration)\$(TargetFileName)" "$(SolutionDir)demo of the ring\stage\$(Platform)\$(Configuration)_Res" /Y</Command>
+      <Command>md "$(SolutionDir)demo of the ring\stage"
+md "$(SolutionDir)demo of the ring\stage\$(Platform)"
+md "$(SolutionDir)demo of the ring\stage\$(Platform)\$(Configuration)_Res"
+xcopy "$(SolutionDir)$(Platform)\$(Configuration)\$(TargetFileName)" "$(SolutionDir)demo of the ring\stage\$(Platform)\$(Configuration)_Res" /Y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
