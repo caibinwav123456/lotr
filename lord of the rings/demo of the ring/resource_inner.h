@@ -2,10 +2,10 @@
 // Microsoft Visual C++ generated include file.
 // Used by Script1_ResVersion.rc
 //
-#define IDI_ICON_32                     102
-#define IDI_ICON_64                     103
-#define IDI_ICON_128                    104
-#define IDI_ICON_256                    105
+#define IDI_ICON_256                    102
+#define IDI_ICON_128                    103
+#define IDI_ICON_64                     104
+#define IDI_ICON_32                     105
 #define IDS_STR_DECLINE                 106
 #define IDS_STR_ERROR                   107
 #define IDR_IMAGE_BK                    108
